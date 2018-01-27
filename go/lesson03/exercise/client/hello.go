@@ -10,6 +10,8 @@ import (
 	"github.com/opentracing/opentracing-go/log"
 	"github.com/yurishkuro/opentracing-tutorial/go/lib/http"
 	"github.com/yurishkuro/opentracing-tutorial/go/lib/tracing"
+
+	"github.com/opentracing/opentracing-go/ext"
 )
 
 func main() {
@@ -43,6 +45,17 @@ func formatString(ctx context.Context, helloTo string) string {
 	if err != nil {
 		panic(err.Error())
 	}
+
+	// to pass context along the wire
+	ext.SpanKindRPCClient.Set(span)
+	ext.HTTPUrl.Set(span, "http://localhost:8081/format")
+	ext.HTTPMethod.Set(span, "GET")
+	span.Tracer().Inject(
+		span.Context(),
+		opentracing.HTTPHeaders,
+		opentracing.HTTPHeadersCarrier(req.Header),
+	)
+
 	resp, err := xhttp.Do(req)
 	if err != nil {
 		panic(err.Error())
@@ -68,6 +81,17 @@ func printHello(ctx context.Context, helloStr string) {
 	if err != nil {
 		panic(err.Error())
 	}
+
+	// to pass context along the wire
+	ext.SpanKindRPCClient.Set(span)
+	ext.HTTPUrl.Set(span, "http://localhost:8082/publish")
+	ext.HTTPMethod.Set(span, "GET")
+	span.Tracer().Inject(
+		span.Context(),
+		opentracing.HTTPHeaders,
+		opentracing.HTTPHeadersCarrier(req.Header),
+	)
+
 	if _, err := xhttp.Do(req); err != nil {
 		panic(err.Error())
 	}
