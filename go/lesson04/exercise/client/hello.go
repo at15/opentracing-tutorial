@@ -28,7 +28,7 @@ func main() {
 
 	span := tracer.StartSpan("say-hello")
 	span.SetTag("hello-to", helloTo)
-	span.SetBaggageItem("gretting", greeting)
+	span.SetBaggageItem("greeting", greeting)
 	defer span.Finish()
 
 	ctx := opentracing.ContextWithSpan(context.Background(), span)
